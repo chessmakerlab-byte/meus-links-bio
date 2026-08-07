@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Instruções para os navegadores de celular não salvarem a página em cache -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Capivara Xadrez - Links</title>
+    
+    <!-- Importando o Firebase diretamente no HTML -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px 20px; background-color: #f8fafc; color: #334155; }
-        
         .header-container { margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; }
         .logo-empresa { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; }
         h1 { margin: 0; font-size: 28px; color: #1e293b; }
-        
         .links-container { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
-        .botao-link { background: #ffffff; color: #0f172a; padding: 16px 20px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: all 0.2s ease-in-out; }
+        .botao-link { background: #ffffff; color: #0f172a; padding: 16px 20px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: all 0.2s ease-in-out; cursor: pointer; }
         .botao-link:hover { background: #f1f5f9; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
     </style>
 </head>
@@ -28,8 +30,78 @@
     
     <p>Acesse nossos principais canais:</p>
     <div class="links-container">
+        <a href="https://docs.google.com/document/d/1YKrynT45FZjDFTwGNXlxzhFhKGMIPO2dYUHeR6jDmac/edit?tab=t.0" target="_blank" class="botao-link">CAPIVARA XADREZ </a>
         <a href="https://www.instagram.com/capivaraxadrez/" target="_blank" class="botao-link">Capivara Xadrez Instagram</a>
         <a href="https://www.instagram.com/capivaraxadrezconecta" target="_blank" class="botao-link">Capivara Conecta Instagram</a>
     </div>
+
+    <!-- Script de Autenticação do Magic Link -->
+    <script>
+        // Suas chaves do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDKNZcKi5euZbAXFFcvaQqrfpFvz7uYHVo",
+            authDomain: "capivaraconecta.firebaseapp.com",
+            projectId: "capivaraconecta",
+            storageBucket: "capivaraconecta.firebasestorage.app",
+            messagingSenderId: "1090195720709",
+            appId: "1:1090195720709:web:9241e2523ab5ea56a52a6c"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Essa função roda assim que a página abre para checar se o usuário veio de um clique do e-mail
+        window.onload = function() {
+            if (auth.isSignInWithEmailLink(window.location.href)) {
+                let email = window.localStorage.getItem('emailForSignIn');
+                if (!email) {
+                    email = window.prompt('Para confirmar sua segurança, digite novamente o seu e-mail:');
+                }
+                
+                auth.signInWithEmailLink(email, window.location.href)
+                    .then((result) => {
+                        window.localStorage.removeItem('emailForSignIn');
+                        let targetUrl = window.localStorage.getItem('targetUrl');
+                        if (targetUrl) {
+                            window.localStorage.removeItem('targetUrl');
+                            // Redireciona para o link secreto!
+                            window.location.href = targetUrl; 
+                        }
+                    })
+                    .catch((error) => {
+                        alert("O link de acesso expirou ou é inválido. Feche esta tela e solicite novamente.");
+                    });
+            }
+        };
+
+        // Função ativada ao clicar no botão
+        function solicitarAcesso(urlDestino, emailsPermitidos) {
+            let emailDigitado = prompt("Este material é restrito. Digite seu e-mail cadastrado:");
+            if (!emailDigitado) return;
+            
+            // Limpa espaços e transforma em minúsculas para comparar com segurança
+            let listaEmails = emailsPermitidos.toLowerCase().split(',').map(e => e.trim());
+            
+            if (listaEmails.includes(emailDigitado.toLowerCase())) {
+                
+                const actionCodeSettings = {
+                    url: window.location.href, // Manda o usuário de volta para esta mesma página
+                    handleCodeInApp: true
+                };
+                
+                auth.sendSignInLinkToEmail(emailDigitado, actionCodeSettings)
+                    .then(() => {
+                        window.localStorage.setItem('emailForSignIn', emailDigitado);
+                        window.localStorage.setItem('targetUrl', urlDestino);
+                        alert("✅ Acesso aprovado! Um link de login foi enviado para " + emailDigitado + ". Verifique sua caixa de entrada.");
+                    })
+                    .catch((error) => {
+                        alert("Erro ao enviar o sistema de verificação. Avise o administrador.");
+                    });
+            } else {
+                alert("⛔ E-mail não autorizado para acessar este link.");
+            }
+        }
+    </script>
 </body>
 </html>
