@@ -96,7 +96,8 @@
                         alert("✅ Acesso aprovado! Um link de login foi enviado para " + emailDigitado + ". Verifique sua caixa de entrada.");
                     })
                     .catch((error) => {
-                        alert("Erro ao enviar o sistema de verificação. Avise o administrador.");
+                        alert("Erro do Firebase: " + error.code + " - " + error.message);
+console.error(error);
                     });
             } else {
                 alert("⛔ E-mail não autorizado para acessar este link.");
