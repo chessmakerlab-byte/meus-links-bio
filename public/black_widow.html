@@ -49,6 +49,7 @@
         
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
+        auth.languageCode = 'pt-BR';
 
         // 1. O QUE ACONTECE QUANDO A PESSOA CLICA NO LINK DO E-MAIL
         window.addEventListener('load', function() {
