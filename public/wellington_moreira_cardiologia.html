@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <title>Wellington Moreira Cardiologia - Links</title>
     
-    <!-- Importando o Firebase diretamente no HTML -->
+    <!-- Importando o Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     
@@ -35,7 +35,7 @@
         <a href="https://www.instagram.com/wmcardiologia/" target="_blank" class="botao-link">Wellington Moreira Cardiologia - Instagram</a>
     </div>
 
-    <!-- Script de Autenticação do Magic Link ATUALIZADO -->
+    <!-- Script Inteligente do Firebase -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDkNZcKi5euZbAXFFcvaQqrfpFVz7uYHVo",
@@ -49,13 +49,14 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        window.onload = function() {
+        // 1. O QUE ACONTECE QUANDO A PESSOA CLICA NO LINK DO E-MAIL
+        window.addEventListener('load', function() {
             if (auth.isSignInWithEmailLink(window.location.href)) {
                 let email = window.localStorage.getItem('emailForSignIn');
                 
-                // Se abriu em outro navegador/celular, pergunta o e-mail apenas para confirmar a identidade
+                // Se a pessoa abriu no celular e o sistema não lembrar do e-mail, pede só pra confirmar
                 if (!email) {
-                    email = window.prompt('Para confirmar sua identidade, digite o e-mail onde recebeu este link:');
+                    email = window.prompt('Para confirmar sua segurança, digite o e-mail onde você recebeu este link:');
                 }
                 
                 if (email) {
@@ -63,31 +64,48 @@
                         .then((result) => {
                             window.localStorage.removeItem('emailForSignIn');
                             
-                            // Busca o destino que "grudamos" na URL
+                            // Acha o link secreto que grudamos na URL
                             const urlParams = new URLSearchParams(window.location.search);
                             let targetUrl = urlParams.get('dest') || window.localStorage.getItem('targetUrl');
                             
                             if (targetUrl) {
                                 window.localStorage.removeItem('targetUrl');
-                                window.location.href = targetUrl; 
+                                window.location.href = targetUrl; // Joga direto pro conteúdo!
                             } else {
-                                alert("Acesso liberado! Você já pode fechar esta tela.");
+                                alert("✅ Autenticação concluída! O seu navegador já está logado. Pode clicar nos links restritos.");
+                                window.history.replaceState(null, null, window.location.pathname);
                             }
                         })
                         .catch((error) => {
                             if (error.code !== 'auth/invalid-email') {
-                                alert("O link de acesso expirou ou já foi usado. Solicite novamente no site.");
+                                alert("O link de acesso expirou. Volte ao site e clique no cadeado novamente.");
                             }
                         });
                 }
             }
-        };
+        });
 
+        // 2. O NOVO BOTÃO COM MEMÓRIA
         function solicitarAcesso(urlDestino, emailsPermitidos) {
+            let listaEmails = emailsPermitidos.toLowerCase().split(',').map(e => e.trim());
+            
+            // Checa se o Firebase já conhece a pessoa
+            const usuarioLogado = auth.currentUser;
+            
+            if (usuarioLogado) {
+                if (listaEmails.includes(usuarioLogado.email.toLowerCase())) {
+                    // Já tá logado e tem permissão? Vai direto pro link sem pedir nada!
+                    window.location.href = urlDestino;
+                    return;
+                } else {
+                    alert("⛔ Seu e-mail logado (" + usuarioLogado.email + ") não tem permissão para este link.");
+                    return;
+                }
+            }
+
+            // Se não estiver logado, faz o processo de pedir o e-mail
             let emailDigitado = prompt("Este material é restrito. Digite seu e-mail cadastrado:");
             if (!emailDigitado) return;
-            
-            let listaEmails = emailsPermitidos.toLowerCase().split(',').map(e => e.trim());
             
             if (listaEmails.includes(emailDigitado.toLowerCase())) {
                 
@@ -96,7 +114,7 @@
                 let urlComDestino = urlAtual + '?dest=' + encodeURIComponent(urlDestino);
                 
                 const actionCodeSettings = {
-                    url: urlComDestino, // Agora o e-mail sabe exatamente para onde ir
+                    url: urlComDestino, 
                     handleCodeInApp: true
                 };
                 
