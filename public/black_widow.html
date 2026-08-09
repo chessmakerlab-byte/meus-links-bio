@@ -36,9 +36,8 @@
         <a href="https://music.apple.com/br/album/f-kin-perfect/416562466?i=416562535" target="_blank" class="botao-link">F**kin' Perfect - Single</a>
     </div>
 
-    <!-- Script de Autenticação do Magic Link -->
+    <!-- Script de Autenticação do Magic Link ATUALIZADO -->
     <script>
-        // Suas chaves do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDkNZcKi5euZbAXFFcvaQqrfpFVz7uYHVo",
             authDomain: "capivaraconecta.firebaseapp.com",
@@ -51,42 +50,54 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        // Essa função roda assim que a página abre para checar se o usuário veio de um clique do e-mail
         window.onload = function() {
             if (auth.isSignInWithEmailLink(window.location.href)) {
                 let email = window.localStorage.getItem('emailForSignIn');
+                
+                // Se abriu em outro navegador/celular, pergunta o e-mail apenas para confirmar a identidade
                 if (!email) {
-                    email = window.prompt('Para confirmar sua segurança, digite novamente o seu e-mail:');
+                    email = window.prompt('Para confirmar sua identidade, digite o e-mail onde recebeu este link:');
                 }
                 
-                auth.signInWithEmailLink(email, window.location.href)
-                    .then((result) => {
-                        window.localStorage.removeItem('emailForSignIn');
-                        let targetUrl = window.localStorage.getItem('targetUrl');
-                        if (targetUrl) {
-                            window.localStorage.removeItem('targetUrl');
-                            // Redireciona para o link secreto!
-                            window.location.href = targetUrl; 
-                        }
-                    })
-                    .catch((error) => {
-                        alert("O link de acesso expirou ou é inválido. Feche esta tela e solicite novamente.");
-                    });
+                if (email) {
+                    auth.signInWithEmailLink(email, window.location.href)
+                        .then((result) => {
+                            window.localStorage.removeItem('emailForSignIn');
+                            
+                            // Busca o destino que "grudamos" na URL
+                            const urlParams = new URLSearchParams(window.location.search);
+                            let targetUrl = urlParams.get('dest') || window.localStorage.getItem('targetUrl');
+                            
+                            if (targetUrl) {
+                                window.localStorage.removeItem('targetUrl');
+                                window.location.href = targetUrl; 
+                            } else {
+                                alert("Acesso liberado! Você já pode fechar esta tela.");
+                            }
+                        })
+                        .catch((error) => {
+                            if (error.code !== 'auth/invalid-email') {
+                                alert("O link de acesso expirou ou já foi usado. Solicite novamente no site.");
+                            }
+                        });
+                }
             }
         };
 
-        // Função ativada ao clicar no botão
         function solicitarAcesso(urlDestino, emailsPermitidos) {
             let emailDigitado = prompt("Este material é restrito. Digite seu e-mail cadastrado:");
             if (!emailDigitado) return;
             
-            // Limpa espaços e transforma em minúsculas para comparar com segurança
             let listaEmails = emailsPermitidos.toLowerCase().split(',').map(e => e.trim());
             
             if (listaEmails.includes(emailDigitado.toLowerCase())) {
                 
+                // Gruda o link de destino na URL de retorno
+                let urlAtual = window.location.href.split('?')[0];
+                let urlComDestino = urlAtual + '?dest=' + encodeURIComponent(urlDestino);
+                
                 const actionCodeSettings = {
-                    url: window.location.href, // Manda o usuário de volta para esta mesma página
+                    url: urlComDestino, // Agora o e-mail sabe exatamente para onde ir
                     handleCodeInApp: true
                 };
                 
@@ -97,8 +108,7 @@
                         alert("✅ Acesso aprovado! Um link de login foi enviado para " + emailDigitado + ". Verifique sua caixa de entrada.");
                     })
                     .catch((error) => {
-                        alert("Erro do Firebase: " + error.code + " - " + error.message);
-console.error(error);
+                        alert("Erro do sistema: " + error.message);
                     });
             } else {
                 alert("⛔ E-mail não autorizado para acessar este link.");
