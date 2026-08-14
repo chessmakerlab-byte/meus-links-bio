@@ -3,12 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>Smashbug - Links</title>
     
-    <!-- Importando o Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     
@@ -18,7 +14,7 @@
         .logo-empresa { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; }
         h1 { margin: 0; font-size: 28px; color: #1e293b; }
         .links-container { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
-        .botao-link { background: #ffffff; color: #0f172a; padding: 16px 20px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: all 0.2s ease-in-out; cursor: pointer; }
+        .botao-link { background: #ffffff; color: #0f172a; padding: 16px 20px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.2s; display: block; }
         .botao-link:hover { background: #f1f5f9; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
     </style>
 </head>
@@ -31,10 +27,9 @@
     <p>Acesse nossos principais canais:</p>
     <div class="links-container">
         <a href="https://www.tiktok.com/pt-BR/" target="_blank" class="botao-link">Smashbug TikTok</a>
-        <a href="https://www.instagram.com/smashbugbrasil/" target="_blank" class="botao-link">Smashbug Instagram</a>
+        <a onclick="solicitarAcesso('https://www.instagram.com/smashbugbrasil/', 'mandita.rr@gmail.com,danilowille@gmail.com')" class="botao-link">🔒 Smashbug Instagram</a>
     </div>
 
-    <!-- Script Inteligente do Firebase -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDkNZcKi5euZbAXFFcvaQqrfpFVz7uYHVo",
@@ -48,91 +43,66 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         auth.languageCode = 'pt-BR';
-        
-        // ADICIONE ESTA LINHA PARA ESQUECER AO FECHAR O NAVEGADOR
         auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
-        // 1. O QUE ACONTECE QUANDO A PESSOA CLICA NO LINK DO E-MAIL
         window.addEventListener('load', function() {
             if (auth.isSignInWithEmailLink(window.location.href)) {
                 let email = window.localStorage.getItem('emailForSignIn');
-                
-                // Se a pessoa abriu no celular e o sistema não lembrar do e-mail, pede só pra confirmar
-                if (!email) {
-                    email = window.prompt('Para confirmar sua segurança, digite o e-mail onde você recebeu este link:');
-                }
+                if (!email) email = window.prompt('Para confirmar sua segurança, digite o e-mail onde você recebeu este link:');
                 
                 if (email) {
                     auth.signInWithEmailLink(email, window.location.href)
                         .then((result) => {
                             window.localStorage.removeItem('emailForSignIn');
-                            
-                            // Acha o link secreto que grudamos na URL
                             const urlParams = new URLSearchParams(window.location.search);
                             let targetUrl = urlParams.get('dest') || window.localStorage.getItem('targetUrl');
                             
                             if (targetUrl) {
                                 window.localStorage.removeItem('targetUrl');
-                                window.location.href = targetUrl; // Joga direto pro conteúdo!
+                                window.location.href = targetUrl; 
                             } else {
-                                alert("✅ Autenticação concluída! O seu navegador já está logado. Pode clicar nos links restritos.");
+                                alert("✅ Autenticação concluída! O seu navegador já está logado.");
                                 window.history.replaceState(null, null, window.location.pathname);
                             }
                         })
                         .catch((error) => {
-                            if (error.code !== 'auth/invalid-email') {
-                                alert("O link de acesso expirou. Volte ao site e clique no cadeado novamente.");
-                            }
+                            if (error.code !== 'auth/invalid-email') alert("O link de acesso expirou. Solicite novamente.");
                         });
                 }
             }
         });
 
-        // 2. O NOVO BOTÃO COM MEMÓRIA
         function solicitarAcesso(urlDestino, emailsPermitidos) {
             let listaEmails = emailsPermitidos.toLowerCase().split(',').map(e => e.trim());
-            
-            // Checa se o Firebase já conhece a pessoa
             const usuarioLogado = auth.currentUser;
             
             if (usuarioLogado) {
                 if (listaEmails.includes(usuarioLogado.email.toLowerCase())) {
-                    // Já tá logado e tem permissão? Vai direto pro link sem pedir nada!
                     window.location.href = urlDestino;
                     return;
                 } else {
-                    alert("⛔ Seu e-mail logado (" + usuarioLogado.email + ") não tem permissão para este link.");
+                    alert("⛔ Seu e-mail logado (" + usuarioLogado.email + ") não pertence ao grupo autorizado.");
                     return;
                 }
             }
 
-            // Se não estiver logado, faz o processo de pedir o e-mail
-            let emailDigitado = prompt("Este material é restrito. Digite seu e-mail cadastrado:");
+            let emailDigitado = prompt("Este material é restrito a alunos autorizados. Digite seu e-mail cadastrado:");
             if (!emailDigitado) return;
             
             if (listaEmails.includes(emailDigitado.toLowerCase())) {
-                
-                // Gruda o link de destino na URL de retorno
                 let urlAtual = window.location.href.split('?')[0];
                 let urlComDestino = urlAtual + '?dest=' + encodeURIComponent(urlDestino);
                 
-                const actionCodeSettings = {
-                    url: urlComDestino, 
-                    handleCodeInApp: true
-                };
+                const actionCodeSettings = { url: urlComDestino, handleCodeInApp: true };
                 
                 auth.sendSignInLinkToEmail(emailDigitado, actionCodeSettings)
                     .then(() => {
                         window.localStorage.setItem('emailForSignIn', emailDigitado);
                         window.localStorage.setItem('targetUrl', urlDestino);
-                        alert("✅ Acesso aprovado! Um link de login foi enviado para " + emailDigitado + ". Verifique sua caixa de entrada.");
+                        alert("✅ Acesso aprovado! Verifique sua caixa de entrada.");
                     })
-                    .catch((error) => {
-                        alert("Erro do sistema: " + error.message);
-                    });
-            } else {
-                alert("⛔ E-mail não autorizado para acessar este link.");
-            }
+                    .catch((error) => { alert("Erro do sistema: " + error.message); });
+            } else { alert("⛔ E-mail não localizado na lista de permissões."); }
         }
     </script>
 </body>
