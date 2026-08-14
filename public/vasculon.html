@@ -24,7 +24,7 @@
         <h1>Vasculon</h1>
     </div>
     
-    <p>Acesse nossos principais canais:</p>
+    <p>Acesse nossos conteúdos:</p>
     <div class="links-container">
         <a onclick="solicitarAcesso('https://open.spotify.com/track/0v1XpBHnsbkCn7iJ9Ucr1l', 'mandita.rr@gmail.com,danilowille@gmail.com')" class="botao-link">🔒 Área Restrita</a>
         <a href="tel:+554333545434" target="_blank" class="botao-link">Fale conosco</a>
@@ -82,12 +82,12 @@
                     window.location.href = urlDestino;
                     return;
                 } else {
-                    alert("⛔ Seu e-mail logado (" + usuarioLogado.email + ") não pertence ao grupo autorizado.");
+                    alert("⛔ O seu e-mail logado (" + usuarioLogado.email + ") não possui permissão (Dono ou Grupo) para acessar este material.");
                     return;
                 }
             }
 
-            let emailDigitado = prompt("Este material é restrito a alunos autorizados. Digite seu e-mail cadastrado:");
+            let emailDigitado = prompt("Este material é restrito. Digite seu e-mail autorizado:");
             if (!emailDigitado) return;
             
             if (listaEmails.includes(emailDigitado.toLowerCase())) {

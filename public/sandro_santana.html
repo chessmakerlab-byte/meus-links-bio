@@ -24,7 +24,7 @@
         <h1>Sandro Santana</h1>
     </div>
     
-    <p>Acesse nossos principais canais:</p>
+    <p>Acesse nossos conteúdos:</p>
     <div class="links-container">
         <a href="https://open.spotify.com/show/7JemdbULjf1jYi1DY7oeCX" target="_blank" class="botao-link">Playlist A saida É Para Dentro</a>
         <a href="https://www.alimentospinduca.com.br/" target="_blank" class="botao-link">Pinduca Alimentos</a>
@@ -83,12 +83,12 @@
                     window.location.href = urlDestino;
                     return;
                 } else {
-                    alert("⛔ Seu e-mail logado (" + usuarioLogado.email + ") não pertence ao grupo autorizado.");
+                    alert("⛔ O seu e-mail logado (" + usuarioLogado.email + ") não possui permissão (Dono ou Grupo) para acessar este material.");
                     return;
                 }
             }
 
-            let emailDigitado = prompt("Este material é restrito a alunos autorizados. Digite seu e-mail cadastrado:");
+            let emailDigitado = prompt("Este material é restrito. Digite seu e-mail autorizado:");
             if (!emailDigitado) return;
             
             if (listaEmails.includes(emailDigitado.toLowerCase())) {

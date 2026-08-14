@@ -24,7 +24,7 @@
         <h1>Black Widow</h1>
     </div>
     
-    <p>Acesse nossos principais canais:</p>
+    <p>Acesse nossos conteúdos:</p>
     <div class="links-container">
         <a href="https://open.spotify.com/track/2AMysGXOe0zzZJMtH3Nizb?si=8XxU7xkyR9KZAmmPNHml5w&utm_source=whatsapp" target="_blank" class="botao-link">Formidable</a>
         <a href="https://music.apple.com/br/album/i-am-invincible/1444608145?i=1444608152" target="_blank" class="botao-link">I Am Invincible - Single</a>
@@ -83,12 +83,12 @@
                     window.location.href = urlDestino;
                     return;
                 } else {
-                    alert("⛔ Seu e-mail logado (" + usuarioLogado.email + ") não pertence ao grupo autorizado.");
+                    alert("⛔ O seu e-mail logado (" + usuarioLogado.email + ") não possui permissão (Dono ou Grupo) para acessar este material.");
                     return;
                 }
             }
 
-            let emailDigitado = prompt("Este material é restrito a alunos autorizados. Digite seu e-mail cadastrado:");
+            let emailDigitado = prompt("Este material é restrito. Digite seu e-mail autorizado:");
             if (!emailDigitado) return;
             
             if (listaEmails.includes(emailDigitado.toLowerCase())) {
