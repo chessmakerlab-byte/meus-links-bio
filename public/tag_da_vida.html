@@ -1,109 +1,15 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TAG DA VIDA - Links</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px 20px; background-color: #f8fafc; color: #334155; }
-        .header-container { margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; }
-        .logo-empresa { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; }
-        h1 { margin: 0; font-size: 28px; color: #1e293b; }
-        .links-container { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
-        .botao-link { background: #ffffff; color: #0f172a; padding: 16px 20px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.2s; display: block; }
-        .botao-link:hover { background: #f1f5f9; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-    </style>
-</head>
-<body>
-    <div class="header-container">
-        <img src="logo_tag_da_vida.png" alt="Logo TAG DA VIDA" class="logo-empresa" onerror="this.style.display='none'">
-        <h1>TAG DA VIDA</h1>
-    </div>
-    
-    <p>Acesse nossos conteúdos:</p>
-    <div class="links-container">
-        <a onclick="solicitarAcesso('#', 'bloqueado@ninguem.com')" class="botao-link">🔒 Acesso Restrito</a>
-        <a href="#" target="_blank" class="botao-link">Contatos de Emergência </a>
-    </div>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkNZcKi5euZbAXFFcvaQqrfpFVz7uYHVo",
-            authDomain: "capivaraconecta.firebaseapp.com",
-            projectId: "capivaraconecta",
-            storageBucket: "capivaraconecta.firebasestorage.app",
-            messagingSenderId: "1090195720709",
-            appId: "1:1090195720709:web:9241e2523ab5ea56a52a6c"
-        };
-        
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        auth.languageCode = 'pt-BR';
-        auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
-
-        window.addEventListener('load', function() {
-            if (auth.isSignInWithEmailLink(window.location.href)) {
-                let email = window.localStorage.getItem('emailForSignIn');
-                if (!email) email = window.prompt('Para confirmar sua segurança, digite o e-mail onde você recebeu este link:');
-                
-                if (email) {
-                    auth.signInWithEmailLink(email, window.location.href)
-                        .then((result) => {
-                            window.localStorage.removeItem('emailForSignIn');
-                            const urlParams = new URLSearchParams(window.location.search);
-                            let targetUrl = urlParams.get('dest') || window.localStorage.getItem('targetUrl');
-                            
-                            if (targetUrl) {
-                                window.localStorage.removeItem('targetUrl');
-                                window.location.href = targetUrl; 
-                            } else {
-                                alert("✅ Autenticação concluída! O seu navegador já está logado.");
-                                window.history.replaceState(null, null, window.location.pathname);
-                            }
-                        })
-                        .catch((error) => {
-                            if (error.code !== 'auth/invalid-email') alert("O link de acesso expirou. Solicite novamente.");
-                        });
-                }
-            }
-        });
-
-        function solicitarAcesso(urlDestino, emailsPermitidos) {
-            let listaEmails = emailsPermitidos.toLowerCase().split(',').map(e => e.trim());
-            const usuarioLogado = auth.currentUser;
-            
-            if (usuarioLogado) {
-                if (listaEmails.includes(usuarioLogado.email.toLowerCase())) {
-                    window.location.href = urlDestino;
-                    return;
-                } else {
-                    alert("⛔ O seu e-mail logado (" + usuarioLogado.email + ") não possui permissão (Dono ou Grupo) para acessar este material.");
-                    return;
-                }
-            }
-
-            let emailDigitado = prompt("Este material é restrito. Digite seu e-mail autorizado:");
-            if (!emailDigitado) return;
-            
-            if (listaEmails.includes(emailDigitado.toLowerCase())) {
-                let urlAtual = window.location.href.split('?')[0];
-                let urlComDestino = urlAtual + '?dest=' + encodeURIComponent(urlDestino);
-                
-                const actionCodeSettings = { url: urlComDestino, handleCodeInApp: true };
-                
-                auth.sendSignInLinkToEmail(emailDigitado, actionCodeSettings)
-                    .then(() => {
-                        window.localStorage.setItem('emailForSignIn', emailDigitado);
-                        window.localStorage.setItem('targetUrl', urlDestino);
-                        alert("✅ Acesso aprovado! Verifique sua caixa de entrada.");
-                    })
-                    .catch((error) => { alert("Erro do sistema: " + error.message); });
-            } else { alert("⛔ E-mail não localizado na lista de permissões."); }
-        }
-    </script>
-</body>
-</html>
+<!DOCTYPE html><html><head><title>TAG DA VIDA</title><style>body{font-family:sans-serif; text-align:center; padding:50px; background:#f8fafc;} .botao-link{background:white; padding:15px; margin:10px auto; display:block; max-width:500px; border-radius:10px; border:1px solid #ddd; text-decoration:none; color:black; cursor:pointer; font-weight:600;}</style></head>
+    <body><div id="modalEmergencia" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
+            <div style="background:white; padding:25px; border-radius:15px; width:100%; max-width:450px; text-align:left; border:3px solid #dc2626; max-height:90vh; overflow-y:auto; box-shadow:0 10px 25px rgba(0,0,0,0.3);">
+                <h2 style="color:#dc2626; margin-top:0; text-align:center;">🏥 Ficha de Emergência</h2>
+                <p><strong>🩸 Tipo Sanguíneo:</strong> <span style="background:#fee2e2; color:#b91c1c; padding:2px 8px; border-radius:4px; font-weight:bold;"></span></p>
+                <hr style="border:0; border-top:1px solid #e2e8f0; margin:15px 0;">
+                <p><strong>👥 Familiar:</strong> Mãe  <br>📞 <a href="tel:43 99167-8134">43 99167-8134</a></p>
+                <p><strong>🩺 Médico Principal:</strong> Medico A <br>📞 <a href="tel:43 99994-3167">43 99994-3167</a></p>
+                <p><strong>🩺 Médico Secundário:</strong> Medico B <br>📞 <a href="tel:43 99995-0010">43 99995-0010</a></p>
+                <hr style="border:0; border-top:1px solid #e2e8f0; margin:15px 0;">
+                <p><strong>⚠️ Alergias:</strong> Metiolate, Lisador</p>
+                <p><strong>💊 Medicamentos:</strong><br>- Selozok 50mg (Diacqua 50mg)<br>- Manhã (Manhã )</p>
+                <p><strong>⚡ Condições Especiais:</strong> Pedra na Vesícula </p>
+                <button onclick="document.getElementById('modalEmergencia').style.display='none'" style="width:100%; margin-top:20px; background:#334155; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">Fechar</button>
+            </div></div><h1>TAG DA VIDA</h1><div class="links-container"><a href="#" target="_blank" class="botao-link">🌐 Acesso Restrito</a><a onclick="document.getElementById('modalEmergencia').style.display='flex'" class="botao-link" style="color:#dc2626; border-color:#fca5a5;">🏥 Contatos de Emergência </a></div></body></html>

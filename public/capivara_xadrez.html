@@ -1,30 +1,15 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head><meta charset="UTF-8"><title>Capivara Xadrez</title>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<style>
-    body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 50px 20px; background: #f8fafc; }
-    .links-container { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
-    .botao-link { background: white; padding: 16px; border-radius: 12px; text-decoration: none; border: 1px solid #e2e8f0; display: block; text-align: left; font-weight: 600; }
-</style>
-</head>
-<body>
-    <h1>Capivara Xadrez</h1>
-    <p style="color: #64748b; font-size: 16px; margin-top: -10px; margin-bottom: 25px;">Veja nossa rede</p>
-    <div class="links-container"><a href="https://docs.google.com/document/d/1YKrynT45FZjDFTwGNXlxzhFhKGMIPO2dYUHeR6jDmac/edit?tab=t.0" target="_blank" class="botao-link">🌐 CAPIVARA XADREZ </a></div>
-    <script>
-        const firebaseConfig = { apiKey: "AIzaSyDkNZcKi5euZbAXFFcvaQqrfpFVz7uYHVo", authDomain: "capivaraconecta.firebaseapp.com", projectId: "capivaraconecta", storageBucket: "capivaraconecta.firebasestorage.app", messagingSenderId: "1090195720709", appId: "1:1090195720709:web:9241e2523ab5ea56a52a6c" };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        function solicitarAcesso(url, emails) {
-            const user = auth.currentUser;
-            if (user && emails.includes(user.email.toLowerCase())) { window.location.href = url; return; }
-            let email = prompt("Este conteúdo é restrito. Digite seu e-mail:");
-            if (email && emails.includes(email.toLowerCase())) {
-                auth.sendSignInLinkToEmail(email, { url: window.location.href, handleCodeInApp: true }).then(() => alert("✅ Link enviado!"));
-            } else { alert("⛔ Acesso negado."); }
-        }
-    </script>
-</body>
-</html>
+<!DOCTYPE html><html><head><title>Capivara Xadrez</title><style>body{font-family:sans-serif; text-align:center; padding:50px; background:#f8fafc;} .botao-link{background:white; padding:15px; margin:10px auto; display:block; max-width:500px; border-radius:10px; border:1px solid #ddd; text-decoration:none; color:black; cursor:pointer; font-weight:600;}</style></head>
+    <body><div id="modalEmergencia" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
+            <div style="background:white; padding:25px; border-radius:15px; width:100%; max-width:450px; text-align:left; border:3px solid #dc2626; max-height:90vh; overflow-y:auto; box-shadow:0 10px 25px rgba(0,0,0,0.3);">
+                <h2 style="color:#dc2626; margin-top:0; text-align:center;">🏥 Ficha de Emergência</h2>
+                <p><strong>🩸 Tipo Sanguíneo:</strong> <span style="background:#fee2e2; color:#b91c1c; padding:2px 8px; border-radius:4px; font-weight:bold;"></span></p>
+                <hr style="border:0; border-top:1px solid #e2e8f0; margin:15px 0;">
+                <p><strong>👥 Familiar:</strong> Mãe  <br>📞 <a href="tel:43 99167-8134">43 99167-8134</a></p>
+                <p><strong>🩺 Médico Principal:</strong> Medico A <br>📞 <a href="tel:43 99994-3167">43 99994-3167</a></p>
+                <p><strong>🩺 Médico Secundário:</strong> Medico B <br>📞 <a href="tel:43 99995-0010">43 99995-0010</a></p>
+                <hr style="border:0; border-top:1px solid #e2e8f0; margin:15px 0;">
+                <p><strong>⚠️ Alergias:</strong> Metiolate, Lisador</p>
+                <p><strong>💊 Medicamentos:</strong><br>- Selozok 50mg (Diacqua 50mg)<br>- Manhã (Manhã )</p>
+                <p><strong>⚡ Condições Especiais:</strong> Pedra na Vesícula </p>
+                <button onclick="document.getElementById('modalEmergencia').style.display='none'" style="width:100%; margin-top:20px; background:#334155; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">Fechar</button>
+            </div></div><h1>Capivara Xadrez</h1><div class="links-container"><a href="https://docs.google.com/document/d/1YKrynT45FZjDFTwGNXlxzhFhKGMIPO2dYUHeR6jDmac/edit?tab=t.0" target="_blank" class="botao-link">🌐 CAPIVARA XADREZ </a><a href="https://www.instagram.com/capivaraxadrez/" target="_blank" class="botao-link">🌐 Capivara Xadrez Instagram</a><a href="https://www.instagram.com/capivaraxadrezconecta" target="_blank" class="botao-link">🌐 Capivara Conecta Instagram</a></div></body></html>
