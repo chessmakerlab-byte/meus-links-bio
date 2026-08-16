@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capivara Xadrez - Central</title>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<style>
+    body { font-family: sans-serif; text-align: center; padding: 30px; background: #f8fafc; color: #334155; }
+    .tab-btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    .tab-btn-geral.active { background: #0284c7; color: white; }
+    .tab-btn-emergencia.active { background: #dc2626; color: white; }
+    .tab-btn-restrita.active { background: #4f46e5; color: white; }
+    .tab-content { display: none; max-width: 500px; margin: 0 auto; flex-direction: column; gap: 15px; }
+    .tab-content.active { display: flex; }
+    .botao-link { background: white; padding: 16px; border-radius: 12px; text-decoration: none; border: 1px solid #e2e8f0; display: block; text-align: left; }
+</style>
+</head>
+<body>
+    <h1>Capivara Xadrez</h1>
+    <p style="color: #64748b; font-size: 16px; margin-top: -15px; margin-bottom: 25px;">Veja nossa rede</p>
+    <div class="tabs-header"><button class="tab-btn tab-btn-geral active" onclick="mudarAba('geral', event)">🌐 Geral</button>
+</div>
+    <div id="geral" class="tab-content active"><a href="https://www.instagram.com/capivaraxadrezconecta" target="_blank" class="botao-link">🌐 Capivara Conecta Instagram</a></div>
+
+    <script>
+        function mudarAba(id, evt) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+        const firebaseConfig = { apiKey: "AIzaSyDkNZcKi5euZbAXFFcvaQqrfpFVz7uYHVo", authDomain: "capivaraconecta.firebaseapp.com", projectId: "capivaraconecta", storageBucket: "capivaraconecta.firebasestorage.app", messagingSenderId: "1090195720709", appId: "1:1090195720709:web:9241e2523ab5ea56a52a6c" };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        function verificarAcessoLiberado(url, emails, btn) {
+            const user = auth.currentUser;
+            if (user && emails.includes(user.email.toLowerCase())) { window.open(url, '_blank'); return; }
+            let email = prompt("Área restrita. Digite seu e-mail:");
+            if (!email || !emails.includes(email.toLowerCase())) { alert("Acesso negado."); return; }
+            auth.sendSignInLinkToEmail(email, { url: window.location.href, handleCodeInApp: true }).then(() => alert("Link mágico enviado!"));
+        }
+    </script>
+</body>
+</html>
