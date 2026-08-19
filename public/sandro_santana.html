@@ -17,23 +17,6 @@
     </style>
 </head>
 <body>
-    
-        <div id="modalEmergencia" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
-            <div style="background:white; padding:25px; border-radius:15px; width:100%; max-width:450px; text-align:left; border:3px solid #dc2626; max-height:90vh; overflow-y:auto; box-shadow:0 10px 25px rgba(0,0,0,0.3);">
-                <h2 style="color:#dc2626; margin-top:0; text-align:center;">🏥 Ficha de Emergência</h2>
-                <h3 style="text-align:center; margin-top:-10px; color:#334155;">👤 Paciente: Amanda R. Rodrigues</h3>
-                <p><strong>🩸 Tipo Sanguíneo:</strong> <span style="background:#fee2e2; color:#b91c1c; padding:2px 8px; border-radius:4px; font-weight:bold;">A+</span></p>
-                <hr style="border:0; border-top:1px solid #e2e8f0; margin:15px 0;">
-                <p><strong>👥 Familiar:</strong> Ricardo <br>📞 <a href="tel:43 99167-8134" style="color:#0284c7; text-decoration:none;">43 99167-8134</a></p>
-                <p><strong>🩺 Médico Principal:</strong> Cardiologista <br>📞 <a href="tel:43 99994-3167" style="color:#0284c7; text-decoration:none;">43 99994-3167</a></p>
-                <p><strong>🩺 Médico Secundário:</strong> Pediatra  <br>📞 <a href="tel:43 99995-0010" style="color:#0284c7; text-decoration:none;">43 99995-0010</a></p>
-                <hr style="border:0; border-top:1px solid #e2e8f0; margin:15px 0;">
-                <p><strong>⚠️ Alergias:</strong> Metiolate, Leite e Derivados De Leite</p>
-                <p><strong>💊 Medicamentos:</strong><br>- Selozok 50mg (Manhã )<br>- Diaqua 50mg (Manhã )</p>
-                <p><strong>⚡ Condições Especiais:</strong> Pedra na Vesícula </p>
-                <button onclick="document.getElementById('modalEmergencia').style.display='none'" style="width:100%; margin-top:20px; background:#334155; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">Fechar</button>
-            </div>
-        </div>
     <div class="header-container">
         <img src="logo_sandro_santana.png" alt="Logo Sandro Santana" class="logo-empresa" onerror="this.style.display='none'">
         <h1>Sandro Santana</h1>
@@ -45,39 +28,22 @@
         <a href="https://www.instagram.com/pinduca.sls" target="_blank" class="botao-link">🌐 Pinduca Instagram</a>
         <a href="https://www.instagram.com/sandrosantana.bem" target="_blank" class="botao-link">🌐 Bem School</a>
     </div>
-
     <script>
         let auth;
         try {
-            const firebaseConfig = {
-                apiKey: "AIzaSyDkNZcKi5euZbAXFFcvaQqrfpFVz7uYHVo",
-                authDomain: "capivaraconecta.firebaseapp.com",
-                projectId: "capivaraconecta",
-                storageBucket: "capivaraconecta.firebasestorage.app",
-                messagingSenderId: "1090195720709",
-                appId: "1:1090195720709:web:9241e2523ab5ea56a52a6c"
-            };
-            firebase.initializeApp(firebaseConfig);
-            auth = firebase.auth();
-            auth.languageCode = 'pt-BR';
-            auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+            const firebaseConfig = { apiKey: "AIzaSyDkNZcKi5euZbAXFFcvaQqrfpFVz7uYHVo", authDomain: "capivaraconecta.firebaseapp.com", projectId: "capivaraconecta", storageBucket: "capivaraconecta.firebasestorage.app", messagingSenderId: "1090195720709", appId: "1:1090195720709:web:9241e2523ab5ea56a52a6c" };
+            firebase.initializeApp(firebaseConfig); auth = firebase.auth(); auth.languageCode = 'pt-BR'; auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
         } catch (erro) { console.error(erro); }
 
         window.addEventListener('load', function() {
             if (auth && auth.isSignInWithEmailLink(window.location.href)) {
                 let email = window.localStorage.getItem('emailForSignIn');
-                if (!email) email = window.prompt('Confirme o e-mail onde você recebeu o link:');
+                if (!email) email = window.prompt('Confirme o e-mail:');
                 if (email) {
                     auth.signInWithEmailLink(email, window.location.href).then(() => {
                         window.localStorage.removeItem('emailForSignIn');
                         let targetUrl = new URLSearchParams(window.location.search).get('dest') || window.localStorage.getItem('targetUrl');
-                        if (targetUrl) {
-                            window.localStorage.removeItem('targetUrl');
-                            window.location.href = targetUrl; 
-                        } else {
-                            alert("✅ Autenticado!");
-                            window.history.replaceState(null, null, window.location.pathname);
-                        }
+                        if (targetUrl) { window.localStorage.removeItem('targetUrl'); window.location.href = targetUrl; } else { alert("✅ Autenticado!"); window.history.replaceState(null, null, window.location.pathname); }
                     }).catch(() => alert("Link expirado."));
                 }
             }
@@ -87,8 +53,7 @@
             if (!auth) { alert("⚠️ Erro no sistema de segurança."); return; }
             let lista = emailsPermitidos.toLowerCase().split(',').map(e => e.trim());
             if (auth.currentUser) {
-                if (lista.includes(auth.currentUser.email.toLowerCase())) window.location.href = urlDestino;
-                else alert("⛔ E-mail sem permissão.");
+                if (lista.includes(auth.currentUser.email.toLowerCase())) { window.location.href = urlDestino; } else alert("⛔ E-mail sem permissão.");
                 return;
             }
             let emailDigitado = prompt("Material restrito. Digite seu e-mail:");
@@ -96,9 +61,7 @@
             if (lista.includes(emailDigitado.toLowerCase())) {
                 let urlComDestino = window.location.href.split('?')[0] + '?dest=' + encodeURIComponent(urlDestino);
                 auth.sendSignInLinkToEmail(emailDigitado, { url: urlComDestino, handleCodeInApp: true }).then(() => {
-                    window.localStorage.setItem('emailForSignIn', emailDigitado);
-                    window.localStorage.setItem('targetUrl', urlDestino);
-                    alert("✅ Link enviado para o e-mail.");
+                    window.localStorage.setItem('emailForSignIn', emailDigitado); window.localStorage.setItem('targetUrl', urlDestino); alert("✅ Link enviado para o e-mail.");
                 });
             } else { alert("⛔ E-mail não localizado nas permissões."); }
         }
