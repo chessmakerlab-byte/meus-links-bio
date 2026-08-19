@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smashbug - Links</title>
+    <title>TAG DA VIDA - Danilo Wille</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 30px 20px; background-color: #f8fafc; color: #334155; margin:0; }
         .header-container { margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; }
@@ -17,21 +18,43 @@
     </style>
 </head>
 <body>
+    
+            <div id="modalEmergencia" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
+                <div style="background:white; padding:25px; border-radius:15px; width:100%; max-width:450px; text-align:left; border:3px solid #dc2626; max-height:90vh; overflow-y:auto; box-shadow:0 10px 25px rgba(0,0,0,0.3);">
+                    <h2 style="color:#dc2626; margin-top:0; text-align:center;">🏥 Ficha de Emergência</h2>
+                    <h3 style="text-align:center; margin-top:-10px; color:#334155;">👤 Paciente: Danilo Wille</h3>
+                    <p><strong>🩸 Tipo Sanguíneo:</strong> <span style="background:#fee2e2; color:#b91c1c; padding:2px 8px; border-radius:4px; font-weight:bold;"></span></p>
+                    <hr style="border:0; border-top:1px solid #e2e8f0; margin:15px 0;">
+                    <p><strong>👥 Familiar:</strong>  <br>📞 <a href="tel:" style="color:#0284c7; text-decoration:none;"></a></p>
+                    <p><strong>🩺 Médico Principal:</strong>  <br>📞 <a href="tel:" style="color:#0284c7; text-decoration:none;"></a></p>
+                    <p><strong>🩺 Médico Secundário:</strong>  <br>📞 <a href="tel:" style="color:#0284c7; text-decoration:none;"></a></p>
+                    <hr style="border:0; border-top:1px solid #e2e8f0; margin:15px 0;">
+                    <p><strong>⚠️ Alergias:</strong> </p>
+                    <p><strong>💊 Medicamentos:</strong><br>-  ()<br>-  ()</p>
+                    <p><strong>⚡ Condições Especiais:</strong> </p>
+                    <button onclick="document.getElementById('modalEmergencia').style.display='none'" style="width:100%; margin-top:20px; background:#334155; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">Fechar</button>
+                </div>
+            </div>
     <div class="header-container">
-        <img src="logo_smashbug.png" alt="Logo Smashbug" class="logo-empresa" onerror="this.style.display='none'">
-        <h1>Smashbug</h1>
+        <img src="logo_tag_da_vida.png" alt="Logo TAG DA VIDA" class="logo-empresa" onerror="this.style.display='none'">
+        <h1>TAG DA VIDA</h1>
     </div>
     <p>Acesse nossos conteúdos:</p>
     <div class="links-container">
-        <a href="https://www.tiktok.com/pt-BR/" target="_blank" class="botao-link">🌐 Smashbug TikTok</a>
-        <a href="#" onclick="solicitarAcesso('https://www.instagram.com/smashbugbrasil/', 'danilowille@gmail.com,mandita.rr@gmail.com'); return false;" class="botao-link">🔒 Smashbug Instagram</a>
+        <a href="#" onclick="document.getElementById('modalEmergencia').style.display='flex'; return false;" class="botao-link" style="color: #dc2626; border-color: #fca5a5;">🏥 Contatos de Emergência </a>
     </div>
     <script>
-        let auth;
+        let auth, storage;
         try {
             const firebaseConfig = { apiKey: "AIzaSyDkNZcKi5euZbAXFFcvaQqrfpFVz7uYHVo", authDomain: "capivaraconecta.firebaseapp.com", projectId: "capivaraconecta", storageBucket: "capivaraconecta.firebasestorage.app", messagingSenderId: "1090195720709", appId: "1:1090195720709:web:9241e2523ab5ea56a52a6c" };
-            firebase.initializeApp(firebaseConfig); auth = firebase.auth(); auth.languageCode = 'pt-BR'; auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+            firebase.initializeApp(firebaseConfig); auth = firebase.auth(); storage = firebase.storage(); auth.languageCode = 'pt-BR'; auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
         } catch (erro) { console.error(erro); }
+
+        function abrirArquivoSeguro(url) {
+            if (url.startsWith('http')) { window.open(url, '_blank'); return; }
+            let ref = url.startsWith('gs://') ? storage.refFromURL(url) : storage.ref(url);
+            ref.getDownloadURL().then((downloadUrl) => { window.open(downloadUrl, '_blank'); }).catch(() => { alert("⛔ Acesso negado pelo Servidor ou arquivo não encontrado."); });
+        }
 
         window.addEventListener('load', function() {
             if (auth && auth.isSignInWithEmailLink(window.location.href)) {
@@ -41,7 +64,7 @@
                     auth.signInWithEmailLink(email, window.location.href).then(() => {
                         window.localStorage.removeItem('emailForSignIn');
                         let targetUrl = new URLSearchParams(window.location.search).get('dest') || window.localStorage.getItem('targetUrl');
-                        if (targetUrl) { window.localStorage.removeItem('targetUrl'); window.location.href = targetUrl; } else { alert("✅ Autenticado!"); window.history.replaceState(null, null, window.location.pathname); }
+                        if (targetUrl) { window.localStorage.removeItem('targetUrl'); abrirArquivoSeguro(targetUrl); } else { alert("✅ Autenticado!"); window.history.replaceState(null, null, window.location.pathname); }
                     }).catch(() => alert("Link expirado."));
                 }
             }
@@ -51,7 +74,7 @@
             if (!auth) { alert("⚠️ Erro no sistema de segurança."); return; }
             let lista = emailsPermitidos.toLowerCase().split(',').map(e => e.trim());
             if (auth.currentUser) {
-                if (lista.includes(auth.currentUser.email.toLowerCase())) { window.location.href = urlDestino; } else alert("⛔ E-mail sem permissão.");
+                if (lista.includes(auth.currentUser.email.toLowerCase())) { abrirArquivoSeguro(urlDestino); } else alert("⛔ E-mail sem permissão.");
                 return;
             }
             let emailDigitado = prompt("Material restrito. Digite seu e-mail:");
